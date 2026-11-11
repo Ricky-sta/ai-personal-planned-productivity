@@ -1,0 +1,179 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Owner personal settings and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "photoURL": { "type": "string", "maxLength": 512 },
+        "targetSGPA": { "type": "number" },
+        "currentSGPA": { "type": "number" },
+        "mascotName": { "type": "string", "maxLength": 64 },
+        "aiEnabled": { "type": "boolean" },
+        "aiPrivacyStrict": { "type": "boolean" },
+        "workHoursStart": { "type": "string", "maxLength": 10 },
+        "workHoursEnd": { "type": "string", "maxLength": 10 },
+        "defaultFocusDuration": { "type": "number" },
+        "defaultBreakDuration": { "type": "number" },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Personal task and deadline items",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "category": { "type": "string", "maxLength": 64 },
+        "priority": { "type": "string", "enum": ["Critical", "High", "Medium", "Low"] },
+        "estimatedMinutes": { "type": "number" },
+        "deadlineDate": { "type": "string", "maxLength": 32 },
+        "deadlineTime": { "type": "string", "maxLength": 16 },
+        "preferredTimeOfDay": { "type": "string", "enum": ["morning", "afternoon", "evening", "night", "any"] },
+        "minSessionMinutes": { "type": "number" },
+        "canSplit": { "type": "boolean" },
+        "isCompleted": { "type": "boolean" },
+        "completedAt": { "type": "string", "maxLength": 64 },
+        "personalNotes": { "type": "string", "maxLength": 2000 },
+        "recurringSchedule": { "type": "string", "maxLength": 64 },
+        "reminderMinutes": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "title", "category", "priority", "estimatedMinutes", "isCompleted"]
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Fixed or flexible schedule commitment",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "category": { "type": "string", "maxLength": 64 },
+        "date": { "type": "string", "maxLength": 32 },
+        "startTime": { "type": "string", "maxLength": 16 },
+        "endTime": { "type": "string", "maxLength": 16 },
+        "isFixed": { "type": "boolean" },
+        "isPinned": { "type": "boolean" },
+        "description": { "type": "string", "maxLength": 1000 },
+        "color": { "type": "string", "maxLength": 32 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "title", "date", "startTime", "endTime", "isFixed"]
+    },
+    "AcademicGoal": {
+      "title": "AcademicGoal",
+      "description": "Semester records, subject study goals and exams",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "subjectName": { "type": "string", "maxLength": 150 },
+        "subjectCode": { "type": "string", "maxLength": 32 },
+        "credits": { "type": "number" },
+        "targetGrade": { "type": "string", "maxLength": 10 },
+        "plannedHours": { "type": "number" },
+        "completedHours": { "type": "number" },
+        "examDate": { "type": "string", "maxLength": 32 },
+        "examType": { "type": "string", "maxLength": 64 },
+        "semester": { "type": "string", "maxLength": 32 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "subjectName", "plannedHours", "completedHours"]
+    },
+    "Routine": {
+      "title": "Routine",
+      "description": "Habit and daily or weekly routine tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 150 },
+        "frequency": { "type": "string", "enum": ["daily", "weekdays", "weekends", "weekly"] },
+        "preferredTime": { "type": "string", "maxLength": 16 },
+        "durationMinutes": { "type": "number" },
+        "streak": { "type": "number" },
+        "bestStreak": { "type": "number" },
+        "lastCompletedDate": { "type": "string", "maxLength": 32 },
+        "color": { "type": "string", "maxLength": 32 },
+        "icon": { "type": "string", "maxLength": 32 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "title", "frequency", "durationMinutes", "streak"]
+    },
+    "FocusSession": {
+      "title": "FocusSession",
+      "description": "Completed pomodoro and focus study logs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "taskId": { "type": "string", "maxLength": 128 },
+        "taskTitle": { "type": "string", "maxLength": 200 },
+        "durationMinutes": { "type": "number" },
+        "date": { "type": "string", "maxLength": 32 },
+        "startedAt": { "type": "string", "maxLength": 64 },
+        "endedAt": { "type": "string", "maxLength": 64 },
+        "notes": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["id", "userId", "durationMinutes", "date", "startedAt"]
+    },
+    "TimetableSlot": {
+      "title": "TimetableSlot",
+      "description": "Daily scheduled slot generated or curated by user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "title": { "type": "string", "maxLength": 200 },
+        "startTime": { "type": "string", "maxLength": 16 },
+        "endTime": { "type": "string", "maxLength": 16 },
+        "category": { "type": "string", "maxLength": 64 },
+        "taskId": { "type": "string", "maxLength": 128 },
+        "isFixed": { "type": "boolean" },
+        "isLocked": { "type": "boolean" },
+        "isCompleted": { "type": "boolean" }
+      },
+      "required": ["id", "userId", "date", "title", "startTime", "endTime", "isFixed", "isLocked"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Owner user profile"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "User tasks and assignments"
+    },
+    "/users/{userId}/events/{eventId}": {
+      "schema": "Event",
+      "description": "User calendar events and timetable commitments"
+    },
+    "/users/{userId}/academics/{academicId}": {
+      "schema": "AcademicGoal",
+      "description": "User academic records, subject goals and exam milestones"
+    },
+    "/users/{userId}/routines/{routineId}": {
+      "schema": "Routine",
+      "description": "User habits and routines"
+    },
+    "/users/{userId}/focus_sessions/{sessionId}": {
+      "schema": "FocusSession",
+      "description": "User logged focus sessions"
+    },
+    "/users/{userId}/timetable/{slotId}": {
+      "schema": "TimetableSlot",
+      "description": "Generated or pinned timetable slots"
+    }
+  }
+}

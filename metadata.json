@@ -1,0 +1,8 @@
+{
+  "name": "ASTRA-PLAN Personal AI Productivity Assistant",
+  "description": "An intimate, anime-inspired personal productivity and time-intelligence companion for university students and achievers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

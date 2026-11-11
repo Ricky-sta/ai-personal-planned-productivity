@@ -1,0 +1,173 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User private vault access: any authenticated Google user can access their own data
+    function isOwner(userId) {
+      return isSignedIn()
+        && request.auth.uid == userId;
+    }
+
+    // Validation for User Profile
+    function isValidUserProfile(data, userId) {
+      return data.uid is string && data.uid == userId
+        && data.email is string && data.email.size() <= 256
+        && (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 128))
+        && (!('targetSGPA' in data) || (data.targetSGPA is number && data.targetSGPA >= 0 && data.targetSGPA <= 10))
+        && (!('currentSGPA' in data) || (data.currentSGPA is number && data.currentSGPA >= 0 && data.currentSGPA <= 10))
+        && (!('mascotName' in data) || (data.mascotName is string && data.mascotName.size() <= 64))
+        && (!('aiEnabled' in data) || data.aiEnabled is bool)
+        && (!('aiPrivacyStrict' in data) || data.aiPrivacyStrict is bool);
+    }
+
+    // Validation for Task
+    function isValidTask(data, userId) {
+      return data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == userId
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.category is string && data.category.size() <= 64
+        && data.priority in ['Critical', 'High', 'Medium', 'Low']
+        && data.estimatedMinutes is number && data.estimatedMinutes >= 0 && data.estimatedMinutes <= 1440
+        && data.isCompleted is bool
+        && (!('description' in data) || (data.description is string && data.description.size() <= 2000))
+        && (!('deadlineDate' in data) || (data.deadlineDate is string && data.deadlineDate.size() <= 32))
+        && (!('deadlineTime' in data) || (data.deadlineTime is string && data.deadlineTime.size() <= 16))
+        && (!('minSessionMinutes' in data) || (data.minSessionMinutes is number && data.minSessionMinutes >= 5))
+        && (!('canSplit' in data) || data.canSplit is bool)
+        && (!('personalNotes' in data) || (data.personalNotes is string && data.personalNotes.size() <= 2000));
+    }
+
+    // Validation for Event
+    function isValidEvent(data, userId) {
+      return data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == userId
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.date is string && data.date.size() <= 32
+        && data.startTime is string && data.startTime.size() <= 16
+        && data.endTime is string && data.endTime.size() <= 16
+        && data.isFixed is bool
+        && (!('category' in data) || (data.category is string && data.category.size() <= 64))
+        && (!('isPinned' in data) || data.isPinned is bool)
+        && (!('description' in data) || (data.description is string && data.description.size() <= 1000));
+    }
+
+    // Validation for Academic Goal
+    function isValidAcademic(data, userId) {
+      return data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == userId
+        && data.subjectName is string && data.subjectName.size() > 0 && data.subjectName.size() <= 150
+        && data.plannedHours is number && data.plannedHours >= 0
+        && data.completedHours is number && data.completedHours >= 0
+        && (!('subjectCode' in data) || (data.subjectCode is string && data.subjectCode.size() <= 32))
+        && (!('credits' in data) || (data.credits is number && data.credits >= 0 && data.credits <= 30))
+        && (!('examDate' in data) || (data.examDate is string && data.examDate.size() <= 32))
+        && (!('examType' in data) || (data.examType is string && data.examType.size() <= 64))
+        && (!('semester' in data) || (data.semester is string && data.semester.size() <= 32));
+    }
+
+    // Validation for Routine
+    function isValidRoutine(data, userId) {
+      return data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == userId
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 150
+        && data.frequency in ['daily', 'weekdays', 'weekends', 'weekly']
+        && data.durationMinutes is number && data.durationMinutes >= 1 && data.durationMinutes <= 720
+        && data.streak is number && data.streak >= 0
+        && (!('preferredTime' in data) || (data.preferredTime is string && data.preferredTime.size() <= 16))
+        && (!('lastCompletedDate' in data) || (data.lastCompletedDate is string && data.lastCompletedDate.size() <= 32));
+    }
+
+    // Validation for Focus Session
+    function isValidFocusSession(data, userId) {
+      return data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == userId
+        && data.durationMinutes is number && data.durationMinutes >= 1 && data.durationMinutes <= 720
+        && data.date is string && data.date.size() <= 32
+        && data.startedAt is string && data.startedAt.size() <= 64
+        && (!('taskTitle' in data) || (data.taskTitle is string && data.taskTitle.size() <= 200))
+        && (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000));
+    }
+
+    // Validation for Timetable Slot
+    function isValidTimetableSlot(data, userId) {
+      return data.id is string && isValidId(data.id)
+        && data.userId is string && data.userId == userId
+        && data.date is string && data.date.size() <= 32
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.startTime is string && data.startTime.size() <= 16
+        && data.endTime is string && data.endTime.size() <= 16
+        && data.isFixed is bool
+        && data.isLocked is bool;
+    }
+
+    // User Profile Document
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUserProfile(request.resource.data, userId);
+      allow update: if isOwner(userId) && isValidUserProfile(request.resource.data, userId);
+      allow delete: if isOwner(userId);
+
+      // Tasks
+      match /tasks/{taskId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(taskId) && isValidTask(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidId(taskId) && isValidTask(request.resource.data, userId);
+        allow delete: if isOwner(userId) && isValidId(taskId);
+      }
+
+      // Events
+      match /events/{eventId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(eventId) && isValidEvent(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidId(eventId) && isValidEvent(request.resource.data, userId);
+        allow delete: if isOwner(userId) && isValidId(eventId);
+      }
+
+      // Academics
+      match /academics/{academicId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(academicId) && isValidAcademic(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidId(academicId) && isValidAcademic(request.resource.data, userId);
+        allow delete: if isOwner(userId) && isValidId(academicId);
+      }
+
+      // Routines
+      match /routines/{routineId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(routineId) && isValidRoutine(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidId(routineId) && isValidRoutine(request.resource.data, userId);
+        allow delete: if isOwner(userId) && isValidId(routineId);
+      }
+
+      // Focus Sessions
+      match /focus_sessions/{sessionId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(sessionId) && isValidFocusSession(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidId(sessionId) && isValidFocusSession(request.resource.data, userId);
+        allow delete: if isOwner(userId) && isValidId(sessionId);
+      }
+
+      // Timetable
+      match /timetable/{slotId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(slotId) && isValidTimetableSlot(request.resource.data, userId);
+        allow update: if isOwner(userId) && isValidId(slotId) && isValidTimetableSlot(request.resource.data, userId);
+        allow delete: if isOwner(userId) && isValidId(slotId);
+      }
+    }
+  }
+}
